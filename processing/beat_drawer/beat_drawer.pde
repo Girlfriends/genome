@@ -8,7 +8,7 @@ NetAddress remoteLocation;
 PGraphics canvas;
 SyphonServer server;
 
-float boxHeight = 50.0f;
+float boxHeight = 71.3f;
 float boxMargin = 5.0;
 
 
@@ -59,7 +59,7 @@ public void draw() {
     float boxWidth = ((width -boxMargin)/ beats.size()) - boxMargin;
     for (int j = 0; j < beats.size(); j++) {
       float boxPositionX = boxMargin + (boxWidth+boxMargin)*j;
-      float boxPositionY = boxMargin + (boxWidth+boxMargin)*i;
+      float boxPositionY = boxMargin + (boxHeight+boxMargin)*i;
       
       if (beats.get(j).type == BeatType.ON) {
         canvas.fill(0, 0, 0);
@@ -67,12 +67,12 @@ public void draw() {
       else {
         canvas.fill(255, 255, 255);
       }
-      canvas.rect(boxPositionX, height-(boxPositionY + boxWidth), boxWidth, boxWidth);
+      canvas.rect(boxPositionX, height-(boxPositionY + boxHeight), boxWidth, boxHeight);
     }
     if (i == 0) {
       canvas.noStroke();
       canvas.fill(255, 0, 0, 127);
-      canvas.rect(boxMargin + (boxWidth+boxMargin)*playheadPosition, height-(boxMargin + boxWidth), boxWidth, boxWidth);
+      canvas.rect(boxMargin + (boxWidth+boxMargin)*playheadPosition, height-(boxMargin + boxHeight), boxWidth, boxHeight);
     }
   }
   canvas.endDraw();
