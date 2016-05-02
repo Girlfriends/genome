@@ -1,0 +1,15 @@
+65, pulses "moveCursor 1" toggleAtCursor;
+70, pulses "moveOffset -1";
+71, pulses "moveCursor 2" toggleAtCursor;
+73, pulses "moveCursor -2" toggleAtCursor;
+76, pulses "moveCursor -1" toggleAtCursor;
+77, accents toggleAtCursor "moveCursor 1";
+80, accents "moveOffset 1";
+86, pulses "moveCursor 2" toggleAtCursor;
+87, accents "incrementCount 1";
+67, pulses "moveOffset 1";
+78, accents "moveOffset -1";
+81, accents toggleAtCursor "moveCursor -1";
+83, pulses "incrementCount 1";
+84, pulses "incrementCount -1";
+89, accents "incrementCount -1";
