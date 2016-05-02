@@ -7,42 +7,24 @@ OscP5 oscP5;
 NetAddress remoteLocation;
 PGraphics canvas;
 SyphonServer server;
-LinkedList<Integer> polypeptideChain;
 
 float boxHeight = 50.0f;
 float boxMargin = 5.0;
 
-float color_nonpolar[] = {1.0, 0.906, 0.373, 1.0};
-float color_polar[] = {0.702, 0.871, 0.753, 1.0};
-float color_basic[] = {0.733, 0.749, 0.878, 1.0};
-float color_acidic[] = {0.973, 0.718, 0.827, 1.0};
 
-Map<String, float[]> colors = new HashMap<String, float[]>();
-JSONObject types;
-
-ArrayList<BeatCollection> beatRows;
+ArrayList<BeatCollection> beatRows = new ArrayList<BeatCollection>(0);
 int BEAT_ROWS_MAX = 10;
 
 public int playheadPosition = 0;
 
 public void settings() {
-  size(400,400, P3D);
+  size(341,768, P3D);
   PJOGL.profile=1;
 }
 
 public void setup() {
-  canvas = createGraphics(400, 400, P3D);
+  canvas = createGraphics(341, 768, P3D);
   frameRate(25);
-  
-  colors.put("nonpolar", color_nonpolar);
-  colors.put("polar", color_polar);
-  colors.put("acidic", color_acidic);
-  colors.put("basic", color_basic);
-  colors = Collections.unmodifiableMap(colors);
-  
-  types = loadJSONObject("types.json");
-  
-  polypeptideChain = new LinkedList<Integer>();
   
   /* start oscP5, listening for incoming messages at port 12000 */
   oscP5 = new OscP5(this,12000);
@@ -55,14 +37,12 @@ public void setup() {
    * send messages back to this sketch.
    */
   remoteLocation = new NetAddress("127.0.0.1",12000);
-  oscP5.plug(this, "addPeptide", "/addPeptide");
-  oscP5.plug(this, "clearPeptides", "/clearPeptides");
   
   oscP5.plug(this, "newBeat", "/newBeat");
   oscP5.plug(this, "setPatternLength", "/setPatternLength");
   oscP5.plug(this, "setPulse", "/setPulse");
-  oscP5.plug(this, "setPlayHead", "/setPlayHead");
-  oscP5.plug(this, "clear", "/clear");
+  oscP5.plug(this, "setPlayhead", "/setPlayhead");
+  oscP5.plug(this, "clear", "/clearAllBeats");
   
   
   // Create syhpon server to send frames out.
@@ -71,22 +51,29 @@ public void setup() {
 
 public void draw() {
   canvas.beginDraw();
+  canvas.noStroke();
   canvas.background(127);
   canvas.lights();
-  for (int i=0; i<polypeptideChain.size(); i++) {
-    Integer ppidx = polypeptideChain.get(i);
-    canvas.pushMatrix();
-    float py = i * (boxHeight+boxMargin) + height/2.0;
-    if (py - boxHeight < height) {
-      String s = ppidx.toString();
-      String type = types.getString(s);
-      float pepColor[] = colors.get(type);
-      println("type: " + type + " mapped to color " + pepColor[0]);
-      canvas.translate(width/2, py);
-      canvas.fill(pepColor[0]*255, pepColor[1]*255, pepColor[2]*255, pepColor[3]*255);
-      canvas.box(width/3, boxHeight, 50);
+  for (int i = 0; i < beatRows.size(); i++) {
+    ArrayList<Beat> beats = beatRows.get(i).beats;
+    float boxWidth = ((width -boxMargin)/ beats.size()) - boxMargin;
+    for (int j = 0; j < beats.size(); j++) {
+      float boxPositionX = boxMargin + (boxWidth+boxMargin)*j;
+      float boxPositionY = boxMargin + (boxWidth+boxMargin)*i;
+      
+      if (beats.get(j).type == BeatType.ON) {
+        canvas.fill(0, 0, 0);
+      }
+      else {
+        canvas.fill(255, 255, 255);
+      }
+      canvas.rect(boxPositionX, height-(boxPositionY + boxWidth), boxWidth, boxWidth);
     }
-    canvas.popMatrix();
+    if (i == 0) {
+      canvas.noStroke();
+      canvas.fill(255, 0, 0, 127);
+      canvas.rect(boxMargin + (boxWidth+boxMargin)*playheadPosition, height-(boxMargin + boxWidth), boxWidth, boxWidth);
+    }
   }
   canvas.endDraw();
   image(canvas, 0, 0);
@@ -103,16 +90,6 @@ void oscEvent(OscMessage theOscMessage) {
   }
 }
 
-public void addPeptide(int peptideIdxID) {
-  polypeptideChain.push(new Integer(peptideIdxID));
-  println("The polypeptide chain is now "+polypeptideChain.size()+" long");
-}
-
-public void clearPeptides() {
-  polypeptideChain.clear();
-}
-
-
 public void newBeat() {
   BeatCollection beatCollection = new BeatCollection();
   beatRows.add(0, beatCollection);
@@ -121,7 +98,7 @@ public void newBeat() {
   }
 }
 
-public void setPatternLength(int patternLength) {   
+public void setPatternLength(int patternLength) {  
   beatRows.get(0).initializeBeatLength(patternLength);
 }
 
@@ -130,5 +107,9 @@ public void setPulse(int index, int type) {
 }
 
 public void setPlayhead(int index) {
-  playheadPosition = index;  
+  playheadPosition = index; 
+}
+
+public void clearAllBeats() {
+   beatRows.clear();
 }
