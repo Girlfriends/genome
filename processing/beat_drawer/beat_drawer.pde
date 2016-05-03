@@ -28,7 +28,7 @@ public void setup() {
   frameRate(25);
   
   /* start oscP5, listening for incoming messages at port 12000 */
-  oscP5 = new OscP5(this,12000);
+  oscP5 = new OscP5(this,12001);
   
   /* myRemoteLocation is a NetAddress. a NetAddress takes 2 parameters,
    * an ip address and a port number. myRemoteLocation is used as parameter in
@@ -37,7 +37,7 @@ public void setup() {
    * and the port of the remote location address are the same, hence you will
    * send messages back to this sketch.
    */
-  remoteLocation = new NetAddress("127.0.0.1",12000);
+  remoteLocation = new NetAddress("127.0.0.1",12001);
   
   oscP5.plug(this, "newBeat", "/newBeat");
   oscP5.plug(this, "setPatternLength", "/setPatternLength");
@@ -47,7 +47,7 @@ public void setup() {
   
   
   // Create syhpon server to send frames out.
-  server = new SyphonServer(this, "Processing Syphon");
+  server = new SyphonServer(this, "processing-syphon");
 }
 
 public void draw() {
@@ -63,9 +63,10 @@ public void draw() {
       float boxPositionY = boxMargin + (boxHeight+boxMargin)*i;
       
       if (beats.get(j).type == BeatType.ON) {
-        canvas.fill(0, 0, 0);
-      }
-      else {
+        canvas.fill(210, 180, 0);
+      } else if (beats.get(j).type == BeatType.ACCENTED) {
+        canvas.fill(216, 30, 10);
+      } else {
         canvas.fill(255, 255, 255);
       }
       canvas.rect(boxPositionX, height-(boxPositionY + boxHeight), boxWidth, boxHeight);
@@ -93,9 +94,7 @@ void oscEvent(OscMessage theOscMessage) {
 
 public void newBeat() {
   BeatCollection beatCollection = new BeatCollection();
-  println(beatCollection);
   beatRows.add(0, beatCollection);
-  println("Siz:" + beatRows.size());
   if (beatRows.size() > BEAT_ROWS_MAX) {
     beatRows.remove(BEAT_ROWS_MAX); 
   }
@@ -115,4 +114,5 @@ public void setPlayhead(int index) {
 
 public void clearAllBeats() {
    beatRows.clear();
+   playheadPosition = 0;
 }

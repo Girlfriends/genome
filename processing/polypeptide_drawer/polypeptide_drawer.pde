@@ -72,7 +72,7 @@ public void setup() {
   oscP5.plug(this, "clearPeptides", "/clearPeptides");
   
   // Create syhpon server to send frames out.
-  server = new SyphonServer(this, "Processing Syphon");
+  server = new SyphonServer(this, "processing-syphon");
   Ani.init(this);
 }
 
