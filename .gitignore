@@ -3,3 +3,5 @@
 Icon*
 documentation
 genome1 Project
+*.class
+*.jar

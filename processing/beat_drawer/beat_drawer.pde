@@ -2,6 +2,7 @@ import codeanticode.syphon.*;
 import oscP5.*;
 import netP5.*;
 import java.util.*;
+import gfbeats.*;
   
 OscP5 oscP5;
 NetAddress remoteLocation;
@@ -92,7 +93,9 @@ void oscEvent(OscMessage theOscMessage) {
 
 public void newBeat() {
   BeatCollection beatCollection = new BeatCollection();
+  println(beatCollection);
   beatRows.add(0, beatCollection);
+  println("Siz:" + beatRows.size());
   if (beatRows.size() > BEAT_ROWS_MAX) {
     beatRows.remove(BEAT_ROWS_MAX); 
   }
